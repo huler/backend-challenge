@@ -39,14 +39,6 @@ Resources:
         Types:
           - REGIONAL
 
-  GatewayPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:invokeFunction
-      FunctionName: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackPrefix}-PostResults
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${LambdaAPI}/*
-
   PostResultsResource:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -176,3 +168,13 @@ Resources:
       RestApiId:
         Ref: LambdaAPI
       StageName: Prod
+
+  GatewayPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - PostResultsLambdaFunction
+    Properties:
+      Action: lambda:invokeFunction
+      FunctionName: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackPrefix}-PostResults
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${LambdaAPI}/*
