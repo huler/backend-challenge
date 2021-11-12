@@ -1,4 +1,4 @@
-# Introduction and thank you
+# Introduction
 
 Recruitment is a two way thing. You've got to like us and what we're all about, and we have to make sure you have the qualities we are looking for in spades. All too often recruitment processes are pretty abstract and don't relate well to the day-to-day roles that are being recruited for. Therefore we decided to make this technical challenge super realistic.
 
