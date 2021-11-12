@@ -14,7 +14,7 @@ This technical challenge is typical of our codebase (we've exaggerated some part
 
 For this technical challenge we would like you to imagine that a member of the Huler team has built an initial implementation of an employee satisfaction survey. Some of the functional elements of this survey tool don't make sense, but for the sake of argument let's assume it was built accurately to spec.
 
-This is an initial implementation, you should assume it is likely that we will want to expand and build on this first implementation.
+This is an initial implementation, you should assume we will want to expand and build on this first implementation.
 
 ### Part 1
 
@@ -36,13 +36,19 @@ As an example,
 
 There are many problems with this codebase, don't try to find and document all of them. Take some time to understand the codebase, and concentrate on what you feel are the biggest problems. As a rough guide, aim to document what you feel are the biggest 5-10 problems in this codebase.
 
-Some of the problems you find may not have a clear solution based on the information we have given you here. You should assume that there is some commercial pressure to deliver this tool, but there is enough time to complete any required refactoring, i.e. migrating to a completely different technology will not be possible.
+Some of the problems you find may not have a clear solution based on the information we have given you here. These points will form discussion points for the next stage of our interview process, that will be an opportunity for us to discuss the possible solutions and the tradeoffs involved.
+
+You should assume that there is some commercial pressure to deliver this tool, but there is enough time to complete any required refactoring, i.e. migrating to a completely different technology will not be possible.
 
 ### Part 2
 
-For the second part, we would like you to take some time to address one of the problems you found in the first part of this technical challenge.
+For the second part, we would like you to take some time to address one or two of the problems you found in the first part of this technical challenge.
 
-You will need to build and deploy the application to the AWS infrastructure. The infrastructure is provisioned on a per-request/on-demand basis which means the cost will be negligible (pennies at the most).
+We would encourage you to tackle one of the harder problems you found in the first part. Refactoring the api to use the most appropriate status code might be valuable, but it's not the hardest problem to solve in this codebase.
+
+As a rough guide, if we were to look at the commit history then we would likely see between 100 and 200 lines of code in total that have been added/removed/modified.
+
+You will need to build and deploy the application to the AWS infrastructure. The infrastructure is provisioned on a per-request/on-demand basis and should fall in to the "Always Free" tier. We would encourage you to pull down the infrastructure when you are finished - the dynamo tables are configured to be deleted even if there is data in them.
 
 ### A quick word on cloudformation
 
@@ -50,7 +56,7 @@ We have provisioned the infrastructure using raw cloudformation. This is also th
 
 We are planning to move the majority of our cloudformation infrastructure to CDK over the next 6 months or so.
 
-You are welcome to look at the cloudformation but we would recommend that you don't spend much time with it - concentrate on the javascript and Go parts of this codebase.
+You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is - diagnosing cloudformation issues can be time consuming and don't provide a great deal of value to this process.
 
 ## Thank you
 
