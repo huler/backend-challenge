@@ -4,15 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"sync"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type requestParameters struct {
-	Email      string `json:"email"`
-	Department string `json:"department"`
-	Results    []int  `json:"results"`
+type SurveyResponse struct {
+	Pk      string `json:"pk"`
+	Sk      string `json:"sk"`
+	Results []int  `json:"results"`
 }
 
 func main() {
@@ -22,28 +28,92 @@ func main() {
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Got request: %s\n", request.Body)
 
-	var requestData requestParameters
-	if err := json.Unmarshal([]byte(request.Body), &requestData); err != nil {
-		fmt.Printf("Failed to parse body: %v\n", err)
+	defaultHeaders := make(map[string]string)
+	defaultHeaders["Access-Control-Allow-Origin"] = "*"
+
+	data := fetchData()
+
+	body, err := json.Marshal(&data)
+	if err != nil {
+		fmt.Printf("Failed to marshall json: %v\n", err)
 
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
+			Headers:    defaultHeaders,
 		}, err
 	}
 
-	if requestData.Email == "" || requestData.Department == "" || len(requestData.Results) != 4 {
-		fmt.Printf("Missing data from client: %v\n", requestData)
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers:    defaultHeaders,
+		Body:       string(body),
+	}, nil
+}
 
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-		}, nil
+func fetchData() map[string][]float32 {
+	result := map[string][]float32{}
+
+	departments := []string{
+		"SAAS development",
+		"Bespoke development",
+		"Creative",
+		"HR",
+		"QA",
+		"Project Management",
 	}
 
-	headers := make(map[string]string)
-	headers["Access-Control-Allow-Origin"] = "*"
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(len(departments))
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 204,
-		Headers:    headers,
-	}, nil
+	for _, dept := range departments {
+		go fetchDepartmentData(&waitGroup, &result, dept)
+	}
+
+	waitGroup.Wait()
+
+	return result
+}
+func fetchDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string) {
+	result := []float32{0, 0, 0, 0}
+
+	scanInput := dynamodb.ScanInput{
+		TableName: aws.String(os.Getenv("TableName")),
+		ScanFilter: map[string]*dynamodb.Condition{
+			"sk": {
+				ComparisonOperator: aws.String("EQ"),
+				AttributeValueList: []*dynamodb.AttributeValue{
+					{
+						S: aws.String(fmt.Sprintf("DEPARTMENT#%s", dept)),
+					},
+				},
+			},
+		},
+	}
+
+	svc := dynamodb.New(session.New())
+	scanResult, err := svc.Scan(&scanInput)
+	if err != nil {
+		fmt.Printf("Failed to fetch items: %v\n", err)
+	} else {
+		var responses []SurveyResponse
+		err = dynamodbattribute.UnmarshalListOfMaps(scanResult.Items, &responses)
+
+		for _, response := range responses {
+			for i := 0; i < 4; i++ {
+				result[i] += float32(response.Results[i])
+			}
+		}
+
+		if len(responses) > 0 {
+			responseCount := float32(len(responses))
+			result[0] /= responseCount
+			result[1] /= responseCount
+			result[2] /= responseCount
+			result[3] /= responseCount
+		}
+	}
+
+	(*target)[dept] = result
+
+	waitGroup.Done()
 }
