@@ -77,11 +77,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:PutItem
-                Resource:
-                  Fn::Sub:
-                    - arn:aws:s3:::${StackPrefix}-Table/*
-                    - bucket_name:
-                        Ref: StackPrefix
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt SurveyResultsTable.Arn
 
   PostResultsLambdaFunction:
     Type: AWS::Lambda::Function
