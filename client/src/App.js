@@ -73,7 +73,7 @@ function App() {
         />
       )}
       {currentPage == 2 && (
-        <Page3 onPreviousPage={handlePreviousPage} onSubmit />
+        <Page3 userDetails={userDetails} matrixData={matrixData} />
       )}
     </div>
   );

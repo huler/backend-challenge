@@ -77,7 +77,7 @@ function Page2({ onNextPage, onPreviousPage, setData }) {
 
   return (
     <>
-      <h1>Acme Co satisfaction survey</h1>
+      <h1>Acme Co employee satisfaction survey</h1>
 
       <table>
         <thead>

@@ -12,7 +12,7 @@ function Page1({ onNextPage, onPreviousPage, setData }) {
 
   let [email, setEmail] = useState("");
   const onHandleEmailChange = (e) => {
-    setEmail(e.value);
+    setEmail(e.target.value);
   };
 
   let [department, setDepartment] = useState(departments[0]);
@@ -30,7 +30,7 @@ function Page1({ onNextPage, onPreviousPage, setData }) {
 
   return (
     <>
-      <h1>Acme Co satisfaction survey</h1>
+      <h1>Acme Co employee satisfaction survey</h1>
       <div>Welcome to the Huler employee satisfaction survey.</div>
 
       <div className="question-container" key="email">
