@@ -14,13 +14,10 @@ function Page3({ userDetails, matrixData }) {
     };
     console.log(payload);
 
-    fetch(
-      "https://9qa7ws9f9l.execute-api.eu-west-1.amazonaws.com/Prod/postresults",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
+    fetch(process.env.REACT_APP_API_LOCATION + "/Prod/postresults", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   }, []);
 
   return (

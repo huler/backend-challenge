@@ -34,9 +34,7 @@ function Results({ onNextPage, onPreviousPage }) {
   console.log(results);
 
   useEffect(() => {
-    fetch(
-      "https://9qa7ws9f9l.execute-api.eu-west-1.amazonaws.com/Prod/getresults"
-    )
+    fetch(process.env.REACT_APP_API_LOCATION + "/Prod/getresults")
       .then((response) => response.json())
       .then((data) => {
         setResults(data);
