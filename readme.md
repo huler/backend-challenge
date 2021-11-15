@@ -48,6 +48,8 @@ As a rough guide, if we were to look at the commit history then we would likely 
 
 You will need to build and deploy the application to the AWS infrastructure. The infrastructure is provisioned on a per-request/on-demand basis and should fall in to the "Always Free" tier. We would encourage you to pull down the infrastructure when you are finished - the dynamo tables are configured to be deleted even if there is data in them.
 
+You can find instructions in `setup.md` on how to build and deploy this application in to your AWS account.
+
 ### A quick word on cloudformation
 
 We have provisioned the infrastructure using raw cloudformation. This is also the case for our codebase, although it is better organised than what we have put together here.
