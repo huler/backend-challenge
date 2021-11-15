@@ -3,7 +3,6 @@ import "./App.css";
 import React, { useState } from "react";
 import Page1 from "./page1";
 import Page2 from "./page2";
-import Page2a from "./page2a";
 import Page3 from "./page3";
 import Choice from "./choice";
 import Results from "./results";
@@ -64,12 +63,6 @@ function App() {
           onNextPage={handleSubmit}
           onPreviousPage={handlePreviousPage}
           setData={setMatrixData}
-        />
-      )}
-      {currentPage == 20 && (
-        <Page2a
-          onNextPage={handleNextPage}
-          onPreviousPage={handlePreviousPage}
         />
       )}
       {currentPage == 2 && (
