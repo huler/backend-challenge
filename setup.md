@@ -6,8 +6,6 @@ There are three parts to this codebase,
 2. The golang code that will serve any api requests
 3. The React client application.
 
-We would suggest that you set the infrastructure up first, and then configure the React application.
-
 ## AWS installation instructions
 
 In order to set-up the application on AWS.
@@ -40,7 +38,7 @@ In order to set-up the application on AWS.
 
 - In the Physical ID column will be a 10 character id (something like 9qa7ws9f9l). You will also need the region you deployed your stack to. For example, if your Physical ID is 9qa7ws9f9l, and this was deployed to the eu-west-1 region (Ireland), the base location for your api endpoints will be `https://9qa7ws9f9l.execute-api.eu-west-1.amazonaws.com`
 
-- Check by entering `https://9qa7ws9f9l.execute-api.eu-west-1.amazonaws.com/Prod/getresults` in to your browser, you will get some results back.
+- Check by entering `https://9qa7ws9f9l.execute-api.eu-west-1.amazonaws.com/Prod/getresults` in to your browser, you should get some results back.
 
 ## Client setup instructions
 
