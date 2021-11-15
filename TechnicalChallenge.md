@@ -1,12 +1,10 @@
 # Introduction
 
-Recruitment is a two way thing. You've got to like us and what we're all about, and we have to make sure you have the qualities we are looking for in spades. All too often recruitment processes are pretty abstract and don't relate well to the day-to-day roles that are being recruited for. Therefore we decided to make this technical challenge super realistic.
-
-We launched Huler in April 2021, it was a busy time working to get all the required functonality working as expected and get everything ready in time. We're not going to lie, this meant that we didn't produce the best code we've ever seen. Our codebase works, but there are definitely areas for improvement. To be fair, we've seen worse code too.
+When we launched Huler in April 2021, it was a busy time working to get all the required functionality working as expected and getting the product ready to launch. As a business, we are always looking to improve the ways we work and improve the user experience for our customers.
 
 This technical challenge is typical of our codebase (we've exaggerated some parts of it). We've done this for two reasons,
 
-1. It gives you an accurate idea of what it is like working with our codebase. We are currently in a phase of development where we are adding new features, but we also have some time available to improve what we already have in place. If working with our codebase and technologies is not for you, then now is the best time to find out!
+1. It gives you an accurate idea of what it is like working with our codebase. We are currently in a phase of development where we are adding new features, but we also have some time available to improve what we already have in place.
 
 2. It tells us about your skills in working with our codebase, your ability to spot problems, prioritise issues, suggest solutions, as well as your understanding of the technologies we use.
 
@@ -14,7 +12,7 @@ This technical challenge is typical of our codebase (we've exaggerated some part
 
 For this technical challenge we would like you to imagine that a member of the Huler team has built an initial implementation of an employee satisfaction survey. Some of the functional elements of this survey tool don't make sense, but for the sake of argument let's assume it was built accurately to spec.
 
-This is an initial implementation, you should assume we will want to expand and build on this first implementation.
+This is an initial implementation; you should assume it is likely that we will want to expand and build on this first implementation.
 
 ### Part 1
 
@@ -34,7 +32,7 @@ For each problem you find, we would like you to write three sentences,
 As an example,
 "The api always returns status code 5xx if there are any problems. This means that the React application can't differentiate between a server-side issue and a client-side issue. I would return the appropriate status code, 4xx in this case if there are any problems with the data provided by the user."
 
-There are many problems with this codebase, don't try to find and document all of them. Take some time to understand the codebase, and concentrate on what you feel are the biggest problems. As a rough guide, aim to document what you feel are the biggest 5-10 problems in this codebase.
+There are many problems with this codebase, we don’t expect you to find and document all of them. Take some time to understand the codebase, and concentrate on what you feel are the biggest problems. As a rough guide, aim to document the 5 problems you would prioritise fixing in this codebase.
 
 Some of the problems you find may not have a clear solution based on the information we have given you here. These points will form discussion points for the next stage of our interview process, that will be an opportunity for us to discuss the possible solutions and the tradeoffs involved.
 
@@ -60,8 +58,4 @@ You might feel that some of the problems you find in the first part are best sol
 
 ## Thank you
 
-Once you are done we would appreciate you checking your response into a private github repo and inviting us to that repo so that we can see what you've been up to!
-
-We hope that you enjoy this challenge, and look forward to receiving your response. Rest assured, we understand the commitment that you are undertaking. We have spent a lot of time preparing this challenge, and will put a lot of effort into reviewing what we get back.
-
-Good Luck!!
+Once you are done we would appreciate you checking your response into a private github repo and invite 'DewiWilliamsMCG' (dewi.williams@myclevergroup.com).
