@@ -50,7 +50,7 @@ In order to set-up the application on AWS.
 yarn install
 ```
 
-- In the client directory there is a file called `.env.example`. Copy this file and rename it to `.env`, modify it's content to the base location for your api endpoints from the section above.
+- In the client directory there is a file called `env.example`. Copy this file and rename it to `.env`, modify it's content to the base location for your api endpoints from the section above.
 
 - type
 
