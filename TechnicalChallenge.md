@@ -54,7 +54,7 @@ We have provisioned the infrastructure using raw cloudformation. This is also th
 
 We are planning to move the majority of our cloudformation infrastructure to CDK over the next 6 months or so.
 
-You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is - diagnosing cloudformation issues can be time consuming and don't provide a great deal of value to this process.
+You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is and focus on the JavaScript and Go parts of the codebase.
 
 ## Thank you
 
