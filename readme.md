@@ -2,7 +2,7 @@
 
 When we launched Huler in April 2021, it was a busy time working to get all the required functionality working as expected and getting the product ready to launch. As a business, we are always looking to improve the ways we work and improve the user experience for our customers.
 
-This technical challenge is typical of our codebase (we've exaggerated some parts of it). We've done this for two reasons,
+This repository is typical of our codebase (we've exaggerated some parts of it). We've done this for two reasons,
 
 1. It gives you an accurate idea of what it is like working with our codebase. We are currently in a phase of development where we are adding new features, but we also have some time available to improve what we already have in place.
 
@@ -10,7 +10,7 @@ This technical challenge is typical of our codebase (we've exaggerated some part
 
 ## The premise
 
-For this technical challenge we would like you to imagine that a member of the Huler team has built an initial implementation of an employee satisfaction survey. Some of the functional elements of this survey tool don't make sense, but for the sake of argument let's assume it was built accurately to spec.
+For this code review we would like you to imagine that a member of the Huler team has built an initial implementation of an employee satisfaction survey. Some of the functional elements of this survey tool don't make sense, but for the sake of argument let's assume it was built accurately to spec.
 
 This is an initial implementation; you should assume it is likely that we will want to expand and build on this first implementation.
 
@@ -38,9 +38,9 @@ Some of the problems you find may not have a clear solution based on the informa
 
 You should assume that there is some commercial pressure to deliver this tool, but there is enough time to complete any required refactoring, i.e. migrating to a completely different technology will not be possible.
 
-### Part 2
+### Part 2 (Optional)
 
-For the second part, we would like you to take some time to address one or two of the problems you found in the first part of this technical challenge.
+For the second part, we would like you to take some time to address one or two of the problems you found in the first part of this code review.
 
 We would encourage you to tackle one of the harder problems you found in the first part. Refactoring the api to use the most appropriate status code might be valuable, but it's not the hardest problem to solve in this codebase.
 
@@ -56,8 +56,17 @@ We have provisioned the infrastructure using raw cloudformation. This is also th
 
 We are planning to move the majority of our cloudformation infrastructure to CDK over the next 6 months or so.
 
-You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is and focus on the JavaScript and Go parts of the codebase.
+You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is and focus on the Go and JavaScript parts of the codebase.
 
 ## Thank you
 
-Once you are done we would appreciate you checking your response into a private github repo and invite 'DewiWilliamsMCG' (dewi.williams@myclevergroup.com).
+Firstly, thank you for taking the time to look at the code review.
+
+There are a couple of options as to how we can proceed,
+
+1. You can spend some time reviewing this codebase, and we can discuss Part 1 of this code review in detail on a Teams call. We would also be interested to know what part of the codebase would be your priority for refactoring, i.e. if you were to do Part 2, where would you start?
+2. Complete both parts of this code review and push your changes from Part 2 to a private github repo and invite 'DewiWilliamsMCG' (dewi.williams@myclevergroup.com).
+
+We have no preference for how we proceed with the code review; we want to give you the flexibility to choose the option that works best for you. We'd also be happy to proceed down a middleground between the two options.
+
+There is a wide variety of technologies in this codebase, we don't expect you to be familiar with all of them. For the purposes of this code review, we would encourage you to concentrate on those technologies that you are familiar with.
