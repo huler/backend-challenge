@@ -73,7 +73,7 @@ Firstly, thank you for taking the time to look at the code review.
 There are a couple of options as to how we can proceed,
 
 1. You can spend some time reviewing this codebase, and we can discuss Part 1 of this code review in detail on a Teams call. We would also be interested to know what part of the codebase would be your priority for refactoring, i.e. if you were to do Part 2, where would you start?
-2. Complete both parts of this code review and push your changes from Part 2 to a private github repo and invite 'DewiWilliamsMCG' (dewi.williams@myclevergroup.com).
+2. Complete both parts of this code review and push your changes from Part 2 to a private github repo and invite 'DewiWilliamsMCG'.
 
 We have no preference for how we proceed with the code review; we want to give you the flexibility to choose the option that works best for you. We'd also be happy to proceed down a middleground between the two options.
 
