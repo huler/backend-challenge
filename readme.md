@@ -40,7 +40,15 @@ You should assume that there is some commercial pressure to deliver this tool, b
 
 ### Part 2 (Optional)
 
-For the second part, we would like you to take some time to address one or two of the problems you found in the first part of this code review.
+To tackle this second part, you will need to provision this project in your own AWS account. We would recommend that you only do this if the following apply,
+
+- You already have your own AWS account and have secured it appropriately (enabled MFA in particular).
+- You are comfortable reading the cloudformation templates.
+- You understand the resources that will be provisioned in your account.
+
+Everything is designed to fall under the "Always free" tier, but we can't be held responsible for any costs incurred.
+
+We would like you to take some time to address one or two of the problems you found in the first part of this code review.
 
 We would encourage you to tackle one of the harder problems you found in the first part. Refactoring the api to use the most appropriate status code might be valuable, but it's not the hardest problem to solve in this codebase.
 
@@ -56,7 +64,7 @@ We have provisioned the infrastructure using raw cloudformation. This is also th
 
 We are planning to move the majority of our cloudformation infrastructure to CDK over the next 6 months or so.
 
-You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is and focus on the Go and JavaScript parts of the codebase.
+You might feel that some of the problems you find in the first part are best solved with changes to our infrastructure. We can discuss these suggested changes, but we would encourage you to leave the infrastructure as it is and focus on the Go parts of the codebase.
 
 ## Thank you
 
