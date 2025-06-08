@@ -4,15 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"sync"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 type SurveyResponse struct {
@@ -21,7 +16,10 @@ type SurveyResponse struct {
 	Results []int  `json:"results"`
 }
 
+var store SurveyStore
+
 func main() {
+	store = NewDynamoDBStore()
 	lambda.Start(handleRequest)
 }
 
@@ -66,54 +64,10 @@ func fetchData() map[string][]float32 {
 	waitGroup.Add(len(departments))
 
 	for _, dept := range departments {
-		go fetchDepartmentData(&waitGroup, &result, dept)
+		go store.GetDepartmentData(&waitGroup, &result, dept)
 	}
 
 	waitGroup.Wait()
 
 	return result
-}
-func fetchDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string) {
-	result := []float32{0, 0, 0, 0}
-
-	scanInput := dynamodb.ScanInput{
-		TableName: aws.String(os.Getenv("TableName")),
-		ScanFilter: map[string]*dynamodb.Condition{
-			"sk": {
-				ComparisonOperator: aws.String("EQ"),
-				AttributeValueList: []*dynamodb.AttributeValue{
-					{
-						S: aws.String(fmt.Sprintf("DEPARTMENT#%s", dept)),
-					},
-				},
-			},
-		},
-	}
-
-	svc := dynamodb.New(session.New())
-	scanResult, err := svc.Scan(&scanInput)
-	if err != nil {
-		fmt.Printf("Failed to fetch items: %v\n", err)
-	} else {
-		var responses []SurveyResponse
-		err = dynamodbattribute.UnmarshalListOfMaps(scanResult.Items, &responses)
-
-		for _, response := range responses {
-			for i := 0; i < 4; i++ {
-				result[i] += float32(response.Results[i])
-			}
-		}
-
-		if len(responses) > 0 {
-			responseCount := float32(len(responses))
-			result[0] /= responseCount
-			result[1] /= responseCount
-			result[2] /= responseCount
-			result[3] /= responseCount
-		}
-	}
-
-	(*target)[dept] = result
-
-	waitGroup.Done()
 }
