@@ -23,6 +23,52 @@ func NewDynamoDBStore() *DynamoDBStore {
 	}
 }
 
+func (d *DynamoDBStore) AddDepartmentSurveyResponseWithCount(requestData requestParameters) error {
+	surveyData := SurveyResponse{
+		Pk:      fmt.Sprintf("RESPONSE#%s", requestData.Email),
+		Sk:      fmt.Sprintf("DEPARTMENT#%s", requestData.Department),
+		Results: requestData.Results,
+	}
+
+	toStore, err := dynamodbattribute.MarshalMap(surveyData)
+	if err != nil {
+		fmt.Printf("Failed to marshall manifest data: %v\n", err)
+		return err
+	}
+
+	transactInput := &dynamodb.TransactWriteItemsInput{
+		TransactItems: []*dynamodb.TransactWriteItem{
+			{
+				Put: &dynamodb.Put{
+					TableName: d.tableName,
+					Item:      toStore,
+				},
+			},
+			{
+				Update: &dynamodb.Update{
+					TableName: d.tableName,
+					Key: map[string]*dynamodb.AttributeValue{
+						"pk": {S: aws.String("RESPONSE-COUNT")},
+						"sk": {S: aws.String("TOTAL")},
+					},
+					ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+						":inc":   {N: aws.String("1")},
+						":start": {N: aws.String("0")},
+					},
+					UpdateExpression: aws.String("SET responses = if_not_exists(responses, :start) + :inc"),
+				},
+			},
+		},
+	}
+
+	_, err = d.svc.TransactWriteItems(transactInput)
+	if err != nil {
+		return fmt.Errorf("failed to perform transaction: %w", err)
+	}
+
+	return nil
+}
+
 func (d *DynamoDBStore) AddDepartmentSurveyResponse(requestData requestParameters) error {
 	surveyData := SurveyResponse{
 		Pk:      fmt.Sprintf("RESPONSE#%s", requestData.Email),

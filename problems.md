@@ -43,3 +43,19 @@ This document outlines bugs, and design decisions that were identified and prior
   Use a single shared session per request lifecycle or encapsulate the session within a reusable struct. This was achieved by introducing a `DynamoDBStore` struct during the modularization of the data layer, which holds the session and provides methods for database interactions. This ensures:
   - Reusability and efficiency of a single session instance.
   - Cleaner and more manageable code through encapsulated operations.
+
+### 3. Non-Atomic Database Operations
+
+- **What is the problem?**:  
+  Database operations that should be logically atomic — such as recording a user's survey response and incrementing a global response counter — were implemented as two separate calls: `PutItem` for the survey data and `UpdateItem` for the count. This leads to potential race conditions and data inconsistencies if one operation succeeds while the other fails.
+
+- **Why is it a problem?**:  
+  Executing these operations separately introduces the risk of partial writes:
+
+  - If the response is stored but the count is not updated, analytics and metrics become unreliable.
+  - If the count is updated but the response fails, it leads to inflated counts.
+  - These inconsistencies are hard to detect and correct after the fact.
+
+- **How would you fix this problem?**:  
+  Use DynamoDB’s `TransactWriteItems` to group both the `PutItem` and `UpdateItem` into a single atomic transaction. This ensures that either both operations succeed together, or neither is applied.
+

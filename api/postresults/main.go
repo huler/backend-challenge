@@ -59,21 +59,9 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}, nil
 	}
 
-	// Replaced `StoreSurveyResult` with `AddDepartmentSurveyResponse`
-	err := store.AddDepartmentSurveyResponse(requestData)
+	err := store.AddDepartmentSurveyResponseWithCount(requestData)
 	if err != nil {
-		fmt.Printf("Failed to store survey result: %v\n", err)
-
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Headers:    defaultHeaders,
-		}, nil
-	}
-
-	// Replaced `BumpResponseCount` with `UpdateResponseCount`
-	err = store.UpdateResponseCount()
-	if err != nil {
-		fmt.Printf("Failed to bump response count: %v\n", err)
+		fmt.Printf("Failed to store survey result and increase response count: %v\n", err)
 
 		return events.APIGatewayProxyResponse{
 			StatusCode: 500,
