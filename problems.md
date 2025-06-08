@@ -74,4 +74,17 @@ This document outlines bugs, and design decisions that were identified and prior
 - **How would you fix this problem?**:  
   Introduce an error channel (`chan error`) and pass it to each goroutine. Each goroutine sends either `nil` or an error back to the channel. After all goroutines complete, errors are collected and logged centrally. This provides reliable visibility into all parallel execution paths and ensures system robustness.
 
+### 5. Potential Nil Dereference in `GetTotalResponseCount`
 
+- **What is the problem?**:  
+  The function `GetTotalResponseCount` retrieves a specific item from DynamoDB and then attempts to unmarshal the result into a Go struct. However, if the requested item does not exist the subsequent call to unmarshall can cause a panic due to a nil dereference.
+
+- **Why is it a problem?**:  
+  If `data.Item` is `nil`, it indicates that the requested item does not exist in DynamoDB. Attempting to unmarshal a `nil` value results in a runtime panic, which:
+
+  - Crashes the program or Lambda execution.
+  - Makes the service unreliable.
+  - Can lead to increased operational cost and degraded user experience if not handled properly.
+
+- **How would you fix this problem?**:  
+  Add a check immediately after retrieving the item to verify that `data.Item` is not `nil`. If it is `nil`, return a descriptive error before attempting any unmarshalling.

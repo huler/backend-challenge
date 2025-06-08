@@ -144,6 +144,10 @@ func (d *DynamoDBStore) GetTotalResponseCount() (int, error) {
 		return 0, err
 	}
 
+	if data.Item == nil {
+		return 0, fmt.Errorf("item not found in DynamoDB")
+	}
+
 	type totalCount struct {
 		Responses int `json:"responses"`
 	}
