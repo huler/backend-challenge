@@ -30,7 +30,6 @@ var store SurveyStore
 func main() {
 	store = NewDynamoDBStore()
 	lambda.Start(handleRequest)
-
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

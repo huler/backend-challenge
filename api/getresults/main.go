@@ -49,8 +49,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 }
 
 func fetchData() map[string][]float32 {
-	result := map[string][]float32{}
-
 	departments := []string{
 		"SAAS development",
 		"Bespoke development",
@@ -63,11 +61,22 @@ func fetchData() map[string][]float32 {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(len(departments))
 
+	result := map[string][]float32{}
+	errChan := make(chan error, len(departments))
+
 	for _, dept := range departments {
-		go store.GetDepartmentData(&waitGroup, &result, dept)
+		go store.GetDepartmentData(&waitGroup, &result, dept, errChan)
 	}
 
 	waitGroup.Wait()
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+	}
+
 
 	return result
 }

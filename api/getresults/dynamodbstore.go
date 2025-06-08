@@ -24,7 +24,9 @@ func NewDynamoDBStore() *DynamoDBStore {
 	}
 }
 
-func (d *DynamoDBStore) GetDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string) {
+func (d *DynamoDBStore) GetDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string, errChan chan<- error) {
+	defer waitGroup.Done()
+
 	result := []float32{0, 0, 0, 0}
 
 	scanInput := dynamodb.ScanInput{
@@ -44,26 +46,30 @@ func (d *DynamoDBStore) GetDepartmentData(waitGroup *sync.WaitGroup, target *map
 	scanResult, err := d.svc.Scan(&scanInput)
 	if err != nil {
 		fmt.Printf("Failed to fetch items: %v\n", err)
-	} else {
-		var responses []SurveyResponse
-		err = dynamodbattribute.UnmarshalListOfMaps(scanResult.Items, &responses)
+		errChan <- fmt.Errorf("scan failed for dept %s: %w", dept, err)
+		return
+	}
 
-		for _, response := range responses {
-			for i := 0; i < 4; i++ {
-				result[i] += float32(response.Results[i])
-			}
+	var responses []SurveyResponse
+	err = dynamodbattribute.UnmarshalListOfMaps(scanResult.Items, &responses)
+	if err != nil {
+		errChan <- fmt.Errorf("unmarshal failed for dept %s: %w", dept, err)
+		return
+	}
+
+	for _, response := range responses {
+		for i := 0; i < 4; i++ {
+			result[i] += float32(response.Results[i])
 		}
+	}
 
-		if len(responses) > 0 {
-			responseCount := float32(len(responses))
-			result[0] /= responseCount
-			result[1] /= responseCount
-			result[2] /= responseCount
-			result[3] /= responseCount
+	if len(responses) > 0 {
+		responseCount := float32(len(responses))
+		for i := 0; i < 4; i++ {
+			result[i] /= responseCount
 		}
 	}
 
 	(*target)[dept] = result
-
-	waitGroup.Done()
+	errChan <- nil
 }

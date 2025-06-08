@@ -59,3 +59,19 @@ This document outlines bugs, and design decisions that were identified and prior
 - **How would you fix this problem?**:  
   Use DynamoDB’s `TransactWriteItems` to group both the `PutItem` and `UpdateItem` into a single atomic transaction. This ensures that either both operations succeed together, or neither is applied.
 
+### 4. Missing Error Handling in Concurrent Data Fetch
+
+- **What is the problem?**:  
+  When using goroutines to concurrently fetch survey responses for various departments in [getresults/main.go](./api/getresults/main.go), errors from individual goroutines were not properly captured or handled. This could cause failures to go unnoticed and lead to incomplete or misleading results being returned.
+
+- **Why is it a problem?**:  
+  Without capturing and reporting errors from goroutines:
+
+  - Failures in data retrieval (e.g., failed scans, unmarshalling) are silently ignored.
+  - Results can appear as empty or incorrect without any indication of failure.
+  - Debugging becomes significantly harder since the main thread has no visibility into errors within the goroutines.
+
+- **How would you fix this problem?**:  
+  Introduce an error channel (`chan error`) and pass it to each goroutine. Each goroutine sends either `nil` or an error back to the channel. After all goroutines complete, errors are collected and logged centrally. This provides reliable visibility into all parallel execution paths and ensures system robustness.
+
+
