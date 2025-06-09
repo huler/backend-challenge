@@ -6,6 +6,38 @@ This document outlines bugs, and design decisions that were identified and prior
 
 ---
 
+## Assumptions:
+
+- It has been assumed that the **project structure is not to be changed significantly**. All improvements and fixes are applied within the current modular boundaries and file organization.
+- It has been assumed that the **external implementations such as AWS DynamoDB configuration, IAM permissions, and environment variable setup (e.g., `TableName`) are correctly provisioned** and functioning as expected.
+
+## Part 1 Solution:
+
+This document outlines **7 major bugs, design flaws, and architectural improvements** observed in the current implementation. Each issue is discussed in detail with an explanation of the problem, its implications, and a proposed or implemented fix.
+
+While the focus has been on addressing significant concerns affecting data integrity, maintainability, and developer experience, it should be noted that **a few minor issues have not been explicitly documented**. These include non-critical edge cases, stylistic inconsistencies, and minor logging enhancements. This decision has been made to keep the document **concise, focused, and actionable**.
+
+## Part 2 Solution:
+
+The submitted pull request provides complete fixes and improvements for the **first five issues** identified in the previous section. Specifically, it addresses:
+
+1. **Tightly Coupled Data and Application Layers**  
+   → Refactored to decouple business logic from data access logic using the `DynamoDBStore` abstraction.
+
+2. **Repeated DynamoDB Sessions Created For Each Operation on the Data**  
+   → Centralized session creation and reused a single DynamoDB client instance across operations.
+
+3. **Non-Atomic Database Operations**  
+   → Replaced multiple individual writes with a single `TransactWriteItems` call for atomic behavior.
+
+4. **Missing Error Handling in Concurrent Data Fetch**
+   → Introduced an error channel to capture and log errors from goroutines during concurrent department-wise data retrieval.
+
+5. **Potential nil Dereference in `GetTotalResponseCount`**  
+   → Added proper nil checks before unmarshalling the response to prevent runtime panics.
+
+
+## Problems Identified
 ### 1. Tightly Coupled Data and Application Layers
 
 - **What is the problem?**:<br>
@@ -88,3 +120,49 @@ This document outlines bugs, and design decisions that were identified and prior
 
 - **How would you fix this problem?**:  
   Add a check immediately after retrieving the item to verify that `data.Item` is not `nil`. If it is `nil`, return a descriptive error before attempting any unmarshalling.
+
+### 6. Inconsistent Error Handling and Logging in Controller
+
+- **What is the problem?**:  
+  The controllers use inconsistent error handling practices:
+
+  - It prints errors using `fmt.Printf` but returns generic HTTP 500 responses without context.
+  - There's no structured or centralized logging, which limits observability and makes debugging production issues harder.
+
+- **Why is it a problem?**:  
+  Inconsistent and informal error handling has multiple consequences:
+
+  - Logs lack traceability: developers can't correlate logs with specific failures or requests.
+  - Monitoring systems cannot detect specific error types.
+
+- **How would you fix this problem?**:
+
+  - Use structured logging instead of `fmt.Printf`, possibly integrating with a logging library that supports severity levels and context propagation.
+  - Add more granular HTTP response codes (e.g., 400 for client validation errors, 500 for internal errors).
+  - Include request identifiers or metadata in logs for traceability.
+
+  ### 7. Missing Request Payload Validation (Email and Department)
+
+- **What is the problem?**:  
+  The incoming request payload is not strictly validated for expected formats or values. The check only ensures that `Email` and `Department` fields are non-empty and that `Results` contains exactly four integers. However, it does not:
+
+  - Validate whether `Email` has a proper format.
+  - Verify if `Department` matches a predefined list of acceptable departments.
+  - Ensure individual integers in `Results` fall within a valid range (e.g., 1–5).
+
+- **Why is it a problem?**:  
+  Accepting malformed or invalid data can result in:
+
+  - Corrupted or unusable records in the database.
+  - Skewed analytics and reporting.
+  - Increased risk of unexpected behavior or runtime errors.
+  - Potential security vulnerabilities (e.g., injection, abuse via malformed inputs).
+    This also forces downstream systems (analytics, dashboards) to account for poor-quality input.
+
+- **How would you fix this problem?**:  
+  Implement stricter request validation logic:
+  - Use regex to verify `Email` format.
+  - Check `Department` against a controlled list (e.g., `"HR"`, `"QA"`, etc.).
+  - Validate `Results` to ensure all values are within an expected numeric range.
+  - Return HTTP 400 (Bad Request) if the payload is malformed.
+    Optionally, encapsulate validation logic in a reusable function for better testability and modularity.
