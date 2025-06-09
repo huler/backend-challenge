@@ -73,47 +73,46 @@ func fetchData() map[string][]float32 {
 
 	return result
 }
-func fetchDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string) {
-	result := []float32{0, 0, 0, 0}
 
-	scanInput := dynamodb.ScanInput{
+type DepartmentStats struct {
+	TotalScore int `json:"totalScore"`
+	Responses  int `json:"responses"`
+}
+
+func fetchDepartmentData(waitGroup *sync.WaitGroup, target *map[string][]float32, dept string) {
+	defer waitGroup.Done()
+
+	getInput := &dynamodb.GetItemInput{
 		TableName: aws.String(os.Getenv("TableName")),
-		ScanFilter: map[string]*dynamodb.Condition{
+		Key: map[string]*dynamodb.AttributeValue{
+			"pk": {
+				S: aws.String(fmt.Sprintf("STATS#DEPARTMENT#%s", dept)),
+			},
 			"sk": {
-				ComparisonOperator: aws.String("EQ"),
-				AttributeValueList: []*dynamodb.AttributeValue{
-					{
-						S: aws.String(fmt.Sprintf("DEPARTMENT#%s", dept)),
-					},
-				},
+				S: aws.String("TOTALS"),
 			},
 		},
 	}
 
 	svc := dynamodb.New(session.New())
-	scanResult, err := svc.Scan(&scanInput)
+	data, err := svc.GetItem(getInput)
 	if err != nil {
-		fmt.Printf("Failed to fetch items: %v\n", err)
-	} else {
-		var responses []SurveyResponse
-		err = dynamodbattribute.UnmarshalListOfMaps(scanResult.Items, &responses)
-
-		for _, response := range responses {
-			for i := 0; i < 4; i++ {
-				result[i] += float32(response.Results[i])
-			}
-		}
-
-		if len(responses) > 0 {
-			responseCount := float32(len(responses))
-			result[0] /= responseCount
-			result[1] /= responseCount
-			result[2] /= responseCount
-			result[3] /= responseCount
-		}
+		fmt.Printf("Failed to fetch stats for %s: %v\n", dept, err)
+		(*target)[dept] = []float32{0, 0, 0, 0}
+		return
 	}
 
-	(*target)[dept] = result
+	var stats DepartmentStats
+	if err := dynamodbattribute.UnmarshalMap(data.Item, &stats); err != nil {
+		fmt.Printf("Failed to unmarshal stats for %s: %v\n", dept, err)
+		(*target)[dept] = []float32{0, 0, 0, 0}
+		return
+	}
 
-	waitGroup.Done()
+	avg := float32(0)
+	if stats.Responses > 0 {
+		avg = float32(stats.TotalScore) / float32(stats.Responses)
+	}
+
+	(*target)[dept] = []float32{avg, avg, avg, avg}
 }

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -23,9 +25,10 @@ type requestResponse struct {
 	TotalCount int `json:"totalCount"`
 }
 type SurveyResponse struct {
-	Pk      string `json:"pk"`
-	Sk      string `json:"sk"`
-	Results []int  `json:"results"`
+	Pk        string `json:"pk"`
+	Sk        string `json:"sk"`
+	Results   []int  `json:"results"`
+	Timestamp int64  `json:"timestamp"`
 }
 
 func main() {
@@ -66,7 +69,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			Headers:    defaultHeaders,
 		}, nil
 	}
-	if err := bumpResponseCount(); err != nil {
+	if err := bumpResponseCount(requestData); err != nil {
 		fmt.Printf("Failed to bump response count: %v\n", err)
 
 		return events.APIGatewayProxyResponse{
@@ -105,9 +108,10 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 }
 func storeSurveyResult(requestData requestParameters) error {
 	surveyData := SurveyResponse{
-		Pk:      fmt.Sprintf("RESPONSE#%s", requestData.Email),
-		Sk:      fmt.Sprintf("DEPARTMENT#%s", requestData.Department),
-		Results: requestData.Results,
+		Pk:        fmt.Sprintf("RESPONSE#%s", requestData.Email),
+		Sk:        fmt.Sprintf("DEPARTMENT#%s#%d", requestData.Department, time.Now().Unix()),
+		Results:   requestData.Results,
+		Timestamp: time.Now().Unix(),
 	}
 
 	toStore, marshalErr := dynamodbattribute.MarshalMap(surveyData)
@@ -130,7 +134,7 @@ func storeSurveyResult(requestData requestParameters) error {
 
 	return nil
 }
-func bumpResponseCount() error {
+func bumpResponseCount(requestData requestParameters) error {
 	var updateItemInput = &dynamodb.UpdateItemInput{
 		TableName: aws.String(os.Getenv("TableName")),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -145,11 +149,11 @@ func bumpResponseCount() error {
 			":inc": {
 				N: aws.String("1"),
 			},
-			":start": {
-				N: aws.String("0"),
+			":score": {
+				N: aws.String(strconv.Itoa(totalScore(requestData.Results))),
 			},
 		},
-		UpdateExpression: aws.String("SET responses = if_not_exists(responses, :start) + :inc"),
+		UpdateExpression: aws.String("ADD responses :inc, ADD totalScore :score"),
 	}
 
 	svc := dynamodb.New(session.New())
@@ -186,4 +190,12 @@ func getTotalResponseCount() (int, error) {
 	}
 
 	return item.Responses, nil
+}
+
+func totalScore(results []int) int {
+	total := 0
+	for _, r := range results {
+		total += r
+	}
+	return total
 }
